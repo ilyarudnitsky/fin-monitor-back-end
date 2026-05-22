@@ -177,6 +177,22 @@ describe("User GraphQL schema (Nexus)", () => {
       });
     });
 
+    it("rejects execution without Authorization header", async () => {
+      const result = await executeOperation(
+        schema,
+        `query {
+          userCollection(input: {}) {
+            items { id }
+          }
+        }`,
+        { contextValue: { headers: {} } },
+      );
+
+      expect(result.data?.userCollection).toBeNull();
+      expect(result.errors?.[0]?.message).toMatch(/Unauthorized/);
+      expect(db.User.findMany).not.toHaveBeenCalled();
+    });
+
     it("surfaces resolver errors on userUpdate with empty patch", async () => {
       const result = await executeOperation(
         schema,

@@ -1,5 +1,6 @@
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 import { createUserDbMock } from "../helpers/mockDb.js";
+import { createAuthContext } from "../helpers/context.js";
 
 const db = createUserDbMock();
 
@@ -14,8 +15,33 @@ const {
 } = await import("../../src/resolvers/user.js");
 
 describe("user resolvers", () => {
+  let context;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    context = createAuthContext();
+  });
+
+  describe("auth middleware", () => {
+    it("rejects requests without the stub Authorization header", async () => {
+      await expect(
+        user(null, { input: { id: "1" } }, { headers: {} }),
+      ).rejects.toThrow("Unauthorized");
+
+      expect(db.User.findUnique).not.toHaveBeenCalled();
+    });
+
+    it("sets stub auth on context when Authorization header is valid", async () => {
+      db.User.findUnique.mockResolvedValue(null);
+
+      await user(null, { input: { id: "1" } }, context);
+
+      expect(context.auth).toEqual({
+        id: "00000000-0000-4000-8000-000000000099",
+        email: "stub@example.com",
+        name: "Stub User",
+      });
+    });
   });
 
   describe("user", () => {
@@ -32,7 +58,7 @@ describe("user resolvers", () => {
       const result = await user(
         null,
         { input: { id: row.id } },
-        {},
+        context,
       );
 
       expect(db.User.findUnique).toHaveBeenCalledWith({
@@ -62,7 +88,7 @@ describe("user resolvers", () => {
       ];
       db.User.findMany.mockResolvedValue(rows);
 
-      const result = await userCollection(null, { input: {} }, {});
+      const result = await userCollection(null, { input: {} }, context);
 
       expect(db.User.findMany).toHaveBeenCalledWith({
         orderBy: { id: "asc" },
@@ -73,7 +99,7 @@ describe("user resolvers", () => {
     it("applies take and skip when provided", async () => {
       db.User.findMany.mockResolvedValue([]);
 
-      await userCollection(null, { input: { take: 10, skip: 5 } }, {});
+      await userCollection(null, { input: { take: 10, skip: 5 } }, context);
 
       expect(db.User.findMany).toHaveBeenCalledWith({
         orderBy: { id: "asc" },
@@ -94,7 +120,7 @@ describe("user resolvers", () => {
       const row = { id: "3", ...input };
       db.User.create.mockResolvedValue(row);
 
-      const result = await userCreate(null, { input }, {});
+      const result = await userCreate(null, { input }, context);
 
       expect(db.User.create).toHaveBeenCalledWith({ data: input });
       expect(result).toEqual(row);
@@ -105,7 +131,7 @@ describe("user resolvers", () => {
       const row = { id: "3", ...input, firstName: null, lastName: null };
       db.User.create.mockResolvedValue(row);
 
-      const result = await userCreate(null, { input }, {});
+      const result = await userCreate(null, { input }, context);
 
       expect(db.User.create).toHaveBeenCalledWith({ data: input });
       expect(result).toEqual(row);
@@ -124,7 +150,7 @@ describe("user resolvers", () => {
       const result = await userUpdate(
         null,
         { input: { id: "1", email: "updated@example.com", name: null } },
-        {},
+        context,
       );
 
       expect(db.User.update).toHaveBeenCalledWith({
@@ -136,7 +162,7 @@ describe("user resolvers", () => {
 
     it("throws when no updatable fields are provided", async () => {
       await expect(
-        userUpdate(null, { input: { id: "1" } }, {}),
+        userUpdate(null, { input: { id: "1" } }, context),
       ).rejects.toThrow("userUpdate requires at least one field to update");
 
       expect(db.User.update).not.toHaveBeenCalled();
@@ -154,7 +180,7 @@ describe("user resolvers", () => {
       };
       db.User.delete.mockResolvedValue(row);
 
-      const result = await userDelete(null, { input: { id: "1" } }, {});
+      const result = await userDelete(null, { input: { id: "1" } }, context);
 
       expect(db.User.delete).toHaveBeenCalledWith({
         where: { id: "1" },

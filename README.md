@@ -71,8 +71,11 @@ GraphQL endpoint: `http://localhost:3000/graphql`
 ```bash
 curl -s -X POST http://localhost:3000/graphql \
   -H 'content-type: application/json' \
+  -H 'authorization: Bearer stub-token' \
   -d '{"query":"{ userCollection(input: {}) { items { id email name firstName lastName } } }"}'
 ```
+
+All resolvers require stub auth via the `Authorization` header (`Bearer stub-token`).
 
 ## Project layout
 
@@ -93,6 +96,7 @@ src/
   types/                # Nexus schema (one file per model)
     user.js             # User types, inputs, query/mutation fields
     index.js            # makeSchema
+  middleware/           # auth (stub header) + logging
   resolvers/            # resolve functions (one file per model)
     user.js
   db/                   # postgresql-orm client
