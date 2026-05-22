@@ -6,6 +6,8 @@
       "default": { "uuid": true }
     },
     "email": { "type": "String", "unique": true },
-    "name": { "type": "String" }
+    "name": { "type": "String" },
+    "firstName": { "type": "String", "optional": true },
+    "lastName": { "type": "String", "optional": true }
   }
 }

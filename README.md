@@ -37,10 +37,12 @@ After deploy, POST to the printed HTTP API URL:
 ```graphql
 query {
   userCollection(input: {}) {
-    items { id email name }
+    items { id email name firstName lastName }
   }
   user(input: { id: "00000000-0000-4000-8000-000000000001" }) {
     name
+    firstName
+    lastName
   }
 }
 
@@ -49,7 +51,11 @@ mutation {
     id
     email
   }
-  userUpdate(input: { id: "...", name: "Alice Updated" }) { id name }
+  userUpdate(input: { id: "...", firstName: "Alice", lastName: "Updated" }) {
+    id
+    firstName
+    lastName
+  }
   userDelete(input: { id: "..." }) { id }
 }
 ```
@@ -65,7 +71,7 @@ GraphQL endpoint: `http://localhost:3000/graphql`
 ```bash
 curl -s -X POST http://localhost:3000/graphql \
   -H 'content-type: application/json' \
-  -d '{"query":"{ userCollection(input: {}) { items { id email name } } }"}'
+  -d '{"query":"{ userCollection(input: {}) { items { id email name firstName lastName } } }"}'
 ```
 
 ## Project layout

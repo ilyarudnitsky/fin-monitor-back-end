@@ -17,6 +17,8 @@ export const User = objectType({
     t.nonNull.id("id");
     t.nonNull.string("email");
     t.nonNull.string("name");
+    t.string("firstName");
+    t.string("lastName");
   },
 });
 
@@ -44,6 +46,8 @@ export const UserCreateInput = inputObjectType({
   definition(t) {
     t.nonNull.string("email");
     t.nonNull.string("name");
+    t.string("firstName");
+    t.string("lastName");
   },
 });
 
@@ -53,6 +57,8 @@ export const UserUpdateInput = inputObjectType({
     t.nonNull.id("id");
     t.string("email");
     t.string("name");
+    t.string("firstName");
+    t.string("lastName");
   },
 });
 
