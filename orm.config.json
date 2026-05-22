@@ -1,0 +1,7 @@
+{
+  "database": {
+    "provider": "postgresql",
+    "url": "postgresql://postgres:postgres@localhost:5434/fin_monitor"
+  },
+  "schema": "./src/models"
+}

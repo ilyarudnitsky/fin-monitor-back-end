@@ -1,0 +1,11 @@
+{
+  "fields": {
+    "id": {
+      "type": "Uuid",
+      "id": true,
+      "default": { "uuid": true }
+    },
+    "email": { "type": "String", "unique": true },
+    "name": { "type": "String" }
+  }
+}
