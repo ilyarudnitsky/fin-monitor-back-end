@@ -3,6 +3,7 @@ import {
   startServerAndCreateLambdaHandler,
   handlers,
 } from "@as-integrations/aws-lambda";
+import { authenticateContext } from "../middleware/auth.js";
 import { schema } from "../types/index.js";
 
 function normalizeHeaders(headers = {}) {
@@ -20,9 +21,15 @@ const apolloHandler = startServerAndCreateLambdaHandler(
   server,
   handlers.createAPIGatewayProxyEventV2RequestHandler(),
   {
-    context: async ({ event }) => ({
-      headers: normalizeHeaders(event.headers),
-    }),
+    context: async ({ event }) => {
+      const context = {
+        headers: normalizeHeaders(event.headers),
+      };
+
+      authenticateContext(context);
+
+      return context;
+    },
   },
 );
 

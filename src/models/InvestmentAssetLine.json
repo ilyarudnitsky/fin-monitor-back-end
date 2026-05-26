@@ -1,0 +1,28 @@
+{
+  "fields": {
+    "id": {
+      "type": "Uuid",
+      "id": true,
+      "default": { "uuid": true }
+    },
+    "assetId": { "type": "Uuid" },
+    "type": { "type": "String" },
+    "amount": { "type": "String" },
+    "quantity": { "type": "String" },
+    "price": { "type": "String" },
+    "commission": { "type": "String" },
+    "createdAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "updatedAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "notes": { "type": "String", "optional": true },
+    "asset": {
+      "type": "Asset",
+      "relation": { "fields": ["assetId"], "references": ["id"] }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "fields": {
+    "id": {
+      "type": "Uuid",
+      "id": true,
+      "default": { "uuid": true }
+    },
+    "categoryId": { "type": "Uuid" },
+    "createdAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "updatedAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "category": {
+      "type": "Category",
+      "relation": { "fields": ["categoryId"], "references": ["id"] }
+    },
+    "investmentAsset": {
+      "type": "InvestmentAsset",
+      "optional": true,
+      "relation": { "fields": ["id"], "references": ["assetId"] }
+    },
+    "operatingAsset": {
+      "type": "OperatingAsset",
+      "optional": true,
+      "relation": { "fields": ["id"], "references": ["assetId"] }
+    },
+    "dualPurposeAsset": {
+      "type": "DualPurposeAsset",
+      "optional": true,
+      "relation": { "fields": ["id"], "references": ["assetId"] }
+    },
+    "operatingAssetLines": {
+      "type": "OperatingAssetLine",
+      "list": true,
+      "relation": { "fields": ["id"], "references": ["assetId"] }
+    },
+    "investmentAssetLines": {
+      "type": "InvestmentAssetLine",
+      "list": true,
+      "relation": { "fields": ["id"], "references": ["assetId"] }
+    }
+  }
+}

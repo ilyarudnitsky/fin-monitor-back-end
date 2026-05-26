@@ -11,6 +11,7 @@
     "build:check": "node scripts/build-check.mjs",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d && sleep 5 && npm run migrate",
     "migrate": "node scripts/migrate.mjs",
     "db:recreate-user": "node scripts/recreate-user-table.mjs",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
@@ -20,9 +21,10 @@
     "@apollo/server": "^4.11.3",
     "@as-integrations/aws-lambda": "^3.1.0",
     "graphql": "^16.10.0",
+    "graphql-scalars": "^1.25.0",
     "nexus": "^1.3.0",
     "pg": "^8.21.0",
-    "postgresql-orm": "github:ilyarudnitsky/postgresql-orm"
+    "postgresql-orm": "github:ilyarudnitsky/postgresql-orm#1.4.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.5",
@@ -31,6 +33,6 @@
     "serverless-offline": "^14.6.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

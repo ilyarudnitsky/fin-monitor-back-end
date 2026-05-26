@@ -1,0 +1,24 @@
+{
+  "fields": {
+    "assetId": {
+      "type": "Uuid",
+      "id": true
+    },
+    "name": { "type": "String" },
+    "notes": { "type": "String", "optional": true },
+    "netIncome": { "type": "String" },
+    "incomeShare": { "type": "String" },
+    "createdAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "updatedAt": {
+      "type": "DateTime",
+      "default": { "now": true }
+    },
+    "asset": {
+      "type": "Asset",
+      "relation": { "fields": ["assetId"], "references": ["id"] }
+    }
+  }
+}

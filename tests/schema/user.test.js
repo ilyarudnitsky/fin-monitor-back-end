@@ -38,8 +38,9 @@ describe("User GraphQL schema (Nexus)", () => {
       const errors = validationErrors(
         schema,
         `query {
-          userCollection(input: { take: 10, skip: 0 }) {
+          userCollection(input: { page: 1, limit: 10 }) {
             items { id email name firstName lastName }
+            meta { page total pages }
           }
         }`,
       );
@@ -54,10 +55,10 @@ describe("User GraphQL schema (Nexus)", () => {
           userCreate(input: { email: "a@example.com", name: "Alice" }) {
             id
           }
-          userUpdate(input: { id: "1", firstName: "Bob" }) {
+          userUpdate(input: { id: "00000000-0000-4000-8000-000000000001", firstName: "Bob" }) {
             id
           }
-          userDelete(input: { id: "1" }) {
+          userDelete(input: { id: "00000000-0000-4000-8000-000000000001" }) {
             id
           }
         }`,
@@ -112,7 +113,7 @@ describe("User GraphQL schema (Nexus)", () => {
       const errors = validationErrors(
         schema,
         `query {
-          user(input: { id: "1" }) {
+          user(input: { id: "00000000-0000-4000-8000-000000000001" }) {
             notAUserField
           }
         }`,
@@ -126,7 +127,7 @@ describe("User GraphQL schema (Nexus)", () => {
   describe("execution", () => {
     it("returns null firstName and lastName when omitted in the database", async () => {
       const row = {
-        id: "1",
+        id: "00000000-0000-4000-8000-000000000001",
         email: "a@example.com",
         name: "A",
         firstName: null,
@@ -137,7 +138,7 @@ describe("User GraphQL schema (Nexus)", () => {
       const result = await executeOperation(
         schema,
         `query {
-          user(input: { id: "1" }) {
+          user(input: { id: "00000000-0000-4000-8000-000000000001" }) {
             firstName
             lastName
           }
@@ -153,27 +154,33 @@ describe("User GraphQL schema (Nexus)", () => {
     it("runs userCollection through the schema", async () => {
       const rows = [
         {
-          id: "1",
+          id: "00000000-0000-4000-8000-000000000001",
           email: "a@example.com",
           name: "A",
           firstName: "Ann",
           lastName: "A",
         },
       ];
-      db.User.findMany.mockResolvedValue(rows);
-
+      db.User.paginate.mockResolvedValue({
+        items: rows,
+        meta: { page: 1, total: 1, pages: 1 },
+      });
       const result = await executeOperation(
         schema,
         `query {
           userCollection(input: {}) {
             items { id email name firstName lastName }
+            meta { page total pages }
           }
         }`,
       );
 
       expect(result.errors).toBeUndefined();
       expect(result.data).toEqual({
-        userCollection: { items: rows },
+        userCollection: {
+          items: rows,
+          meta: { page: 1, total: 1, pages: 1 },
+        },
       });
     });
 
@@ -188,16 +195,16 @@ describe("User GraphQL schema (Nexus)", () => {
         { contextValue: { headers: {} } },
       );
 
-      expect(result.data?.userCollection).toBeNull();
+      expect(result.data).toBeUndefined();
       expect(result.errors?.[0]?.message).toMatch(/Unauthorized/);
-      expect(db.User.findMany).not.toHaveBeenCalled();
+      expect(db.User.paginate).not.toHaveBeenCalled();
     });
 
     it("surfaces resolver errors on userUpdate with empty patch", async () => {
       const result = await executeOperation(
         schema,
         `mutation {
-          userUpdate(input: { id: "1" }) {
+          userUpdate(input: { id: "00000000-0000-4000-8000-000000000001" }) {
             id
           }
         }`,
