@@ -6,6 +6,8 @@
       "default": { "uuid": true }
     },
     "categoryId": { "type": "Uuid" },
+    "name": { "type": "String" },
+    "notes": { "type": "String", "optional": true },
     "createdAt": {
       "type": "DateTime",
       "default": { "now": true }
@@ -31,16 +33,6 @@
     "dualPurposeAsset": {
       "type": "DualPurposeAsset",
       "optional": true,
-      "relation": { "fields": ["id"], "references": ["assetId"] }
-    },
-    "operatingAssetLines": {
-      "type": "OperatingAssetLine",
-      "list": true,
-      "relation": { "fields": ["id"], "references": ["assetId"] }
-    },
-    "investmentAssetLines": {
-      "type": "InvestmentAssetLine",
-      "list": true,
       "relation": { "fields": ["id"], "references": ["assetId"] }
     }
   }

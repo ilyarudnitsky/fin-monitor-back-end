@@ -1,13 +1,13 @@
 {
   "fields": {
-    "assetId": {
+    "id": {
       "type": "Uuid",
-      "id": true
+      "id": true,
+      "default": { "uuid": true }
     },
-    "name": { "type": "String" },
-    "notes": { "type": "String", "optional": true },
-    "netIncome": { "type": "String" },
-    "incomeShare": { "type": "String" },
+    "assetId": { "type": "Uuid" },
+    "type": { "type": "String" },
+    "value": { "type": "String" },
     "createdAt": {
       "type": "DateTime",
       "default": { "now": true }
@@ -16,6 +16,7 @@
       "type": "DateTime",
       "default": { "now": true }
     },
+    "notes": { "type": "String", "optional": true },
     "asset": {
       "type": "Asset",
       "relation": { "fields": ["assetId"], "references": ["id"] }
