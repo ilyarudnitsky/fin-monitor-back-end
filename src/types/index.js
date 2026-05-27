@@ -4,11 +4,6 @@ import * as entity from "./entity.js";
 import * as shared from "./shared.js";
 import * as category from "./category.js";
 import * as asset from "./asset.js";
-import * as investmentAsset from "./investment-asset.js";
-import * as operatingAsset from "./operating-asset.js";
-import * as dualPurposeAsset from "./dual-purpose-asset.js";
-import * as operatingAssetLine from "./operating-asset-line.js";
-import * as investmentAssetLine from "./investment-asset-line.js";
 import * as user from "./user.js";
 
 function isSchemaType(value) {
@@ -36,11 +31,6 @@ export const schema = makeSchema({
     shared,
     category,
     asset,
-    investmentAsset,
-    operatingAsset,
-    dualPurposeAsset,
-    operatingAssetLine,
-    investmentAssetLine,
     user,
   ),
   outputs: {
