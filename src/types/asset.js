@@ -12,6 +12,8 @@ export const Asset = objectType({
   name: "Asset",
   definition(t) {
     t.implements("Entity");
+    t.string("name");
+    t.string("notes");
   },
 });
 
@@ -52,6 +54,8 @@ export const AssetCreateInput = inputObjectType({
   name: "AssetCreateInput",
   definition(t) {
     t.nonNull.field("category", { type: "EntityInput" });
+    t.nonNull.string("name");
+    t.string("notes");
   },
 });
 

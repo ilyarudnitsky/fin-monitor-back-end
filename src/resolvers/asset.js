@@ -76,6 +76,8 @@ export function flattenAssetForList(asset, categoryLabel) {
   if (!detail) {
     return {
       ...assetListFields(asset),
+      name: asset.name,
+      notes: asset.notes,
       __graphqlType: ASSET_GRAPHQL_TYPE.BASE,
     };
   }
@@ -150,15 +152,12 @@ export const assetCollection = async (...payload) => {
 export const assetCreate = async (...payload) => {
   const [, args] = payload;
   const { input } = args;
-  const category = await findCategory(input.category.id);
-
-  if (!category) {
-    throw new Error("Category not found");
-  }
 
   return db.Asset.create({
     data: {
-      categoryId: category.id,
+      categoryId: args.input.category.id,
+      name: args.input.name,
+      notes: args.input.notes,
     },
   });
 };
