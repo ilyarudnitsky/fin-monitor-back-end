@@ -1,0 +1,47 @@
+import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
+import { db } from "../db/index.js";
+
+export const dualPurposeAsset = async (...payload) => {
+  const [, args] = payload;
+
+  const result = await db.DualPurposeAsset.findFirst({
+    where: { assetId: args.input.asset.id },
+    include: { asset: true },
+  });
+
+  return result;
+};
+
+export const dualPurposeAssetCollection = async (...payload) => {
+  const [, args] = payload;
+  const { asset } = args.input.filter;
+
+  const result = await db.DualPurposeAsset.paginate({
+    where: { assetId: asset.id },
+    orderBy: { createdAt: "desc" },
+    limit: COLLECTION_DEFAULT_LIMIT,
+    page: args.input.page ?? 1,
+  });
+
+  return result;
+};
+
+export const dualPurposeAssetCreate = async (...payload) => {
+  const [, args] = payload;
+  const { input } = args;
+
+  const result = await db.DualPurposeAsset.create({
+    data: {
+      assetId: input.asset.id,
+      type: input.type,
+      amount: input.amount,
+      quantity: input.quantity,
+      price: input.price,
+      commission: input.commission,
+      createdAt: input.createdAt,
+      notes: input.notes,
+    },
+  });
+
+  return result;
+};

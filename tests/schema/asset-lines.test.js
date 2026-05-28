@@ -64,6 +64,33 @@ describe("Asset line GraphQL schema (Nexus)", () => {
     expect(errors).toEqual([]);
   });
 
+  it("accepts dualPurposeAssetCollection", () => {
+    const errors = validationErrors(
+      schema,
+      `query {
+        dualPurposeAssetCollection(
+          input: {
+            filter: { asset: { id: "00000000-0000-4000-8000-000000000001" } }
+            limit: 500
+          }
+        ) {
+          items {
+            id
+            type
+            amount
+            quantity
+            price
+            commission
+            createdAt
+            notes
+          }
+        }
+      }`,
+    );
+
+    expect(errors).toEqual([]);
+  });
+
   it("accepts line create mutations", () => {
     const errors = validationErrors(
       schema,
@@ -89,6 +116,20 @@ describe("Asset line GraphQL schema (Nexus)", () => {
             quantity: "2"
             price: "$1,000"
             commission: "$100"
+            createdAt: "2025-12-20T00:00:00.000Z"
+          }
+        ) {
+          id
+        }
+        dualPurposeAssetCreate(
+          input: {
+            category: { id: "44444444-4444-4444-8444-444444444444" }
+            asset: { id: "00000000-0000-4000-8000-000000000001" }
+            type: "buy"
+            amount: "50 g"
+            quantity: "1"
+            price: "$500"
+            commission: "$50"
             createdAt: "2025-12-20T00:00:00.000Z"
           }
         ) {
