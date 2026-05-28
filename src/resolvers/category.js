@@ -1,71 +1,56 @@
-import { CATEGORY_LABEL } from "../constants/category.js";
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
-import * as include from "../include/index.js";
-import { flattenAssetForList } from "./asset.js";
+const ZERO_STATS = { amount: 0, share: 0 };
 
-function parseMoney(value) {
-  if (value == null || value === "") {
-    return 0;
-  }
+async function resolveCategoryStatsById(categoryId) {
+  const rows = await db.$queryRaw`
+    SELECT
+      COALESCE(
+        SUM(
+          COALESCE(
+            NULLIF(
+              regexp_replace(
+                COALESCE(
+                  ia."amount",
+                  oa."value",
+                  da."amount",
+                  '0'
+                ),
+                '[^0-9.-]',
+                '',
+                'g'
+              ),
+              ''
+            )::double precision,
+            0
+          )
+        ),
+        0
+      ) AS amount,
+      0::double precision AS share
+    FROM "Asset" a
+    LEFT JOIN "InvestmentAsset" ia ON ia."assetId" = a."id"
+    LEFT JOIN "OperatingAsset" oa ON oa."assetId" = a."id"
+    LEFT JOIN "DualPurposeAsset" da ON da."assetId" = a."id"
+    WHERE a."categoryId" = ${categoryId}
+  `;
 
-  if (typeof value === "number") {
-    return value;
-  }
-
-  const normalized = String(value).replace(/[$,\s]/g, "");
-  const parsed = Number.parseFloat(normalized);
-
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function parseShare(value) {
-  if (value == null || value === "") {
-    return 0;
-  }
-
-  if (typeof value === "number") {
-    return value;
-  }
-
-  const normalized = String(value).replace(/%/g, "");
-  const parsed = Number.parseFloat(normalized);
-
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function sumParentMetrics(assets) {
-  return assets.reduce(
-    (totals, asset) => {
-      totals.amount += parseMoney(asset.netIncome);
-      totals.share += parseShare(asset.incomeShare);
-      return totals;
-    },
-    { amount: 0, share: 0 },
-  );
-}
-
-function computeCategoryMetrics(category) {
-  const assets = (category.assets ?? []).map((asset) =>
-    flattenAssetForList(asset, category.label),
-  );
-  const metrics = sumParentMetrics(assets);
-
-  if (
-    category.label === CATEGORY_LABEL.INVESTING ||
-    category.label === CATEGORY_LABEL.DUAL_PURPOSE
-  ) {
-    metrics.investedAmount = metrics.amount;
-    metrics.investedValue = metrics.amount;
-  }
+  const [stats] = rows ?? [];
 
   return {
-    id: category.id,
-    label: category.label,
-    title: category.title,
-    createdAt: category.createdAt,
-    updatedAt: category.updatedAt,
-    metrics,
+    amount: Number(stats?.amount ?? 0),
+    share: Number(stats?.share ?? 0),
+  };
+}
+
+function buildPageMeta(total, page, limit) {
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const normalizedPage = Math.min(Math.max(page, 1), pages);
+
+  return {
+    page: normalizedPage,
+    pages,
+    total,
   };
 }
 
@@ -75,17 +60,58 @@ function computeCategoryMetrics(category) {
 
 export const categoryCollection = async (...payload) => {
   const [, args] = payload;
+  const page = args.input.page ?? 1;
+  const limit = args.input.limit ?? COLLECTION_DEFAULT_LIMIT;
+  const rows = await db.$queryRaw`
+    SELECT
+      c."id" AS id,
+      c."label" AS label,
+      c."title" AS title,
+      c."createdAt" AS "createdAt",
+      c."updatedAt" AS "updatedAt",
+      json_build_object(
+        'amount',
+        COALESCE(
+          SUM(
+            COALESCE(
+              NULLIF(
+                regexp_replace(
+                  COALESCE(
+                    ia."amount",
+                    oa."value",
+                    da."amount",
+                    '0'
+                  ),
+                  '[^0-9.-]',
+                  '',
+                  'g'
+                ),
+                ''
+              )::double precision,
+              0
+            )
+          ),
+          0
+        ),
+        'share',
+        0::double precision
+      ) AS stats
+    FROM "Category" c
+    LEFT JOIN "Asset" a ON a."categoryId" = c."id"
+    LEFT JOIN "InvestmentAsset" ia ON ia."assetId" = a."id"
+    LEFT JOIN "OperatingAsset" oa ON oa."assetId" = a."id"
+    LEFT JOIN "DualPurposeAsset" da ON da."assetId" = a."id"
+    GROUP BY c."id", c."label", c."title", c."createdAt", c."updatedAt"
+    ORDER BY c."title" ASC
+  `;
+  
+  const categories = rows;
 
-  const result = await db.Category.paginate({
-    include: include.category.collection,
-    orderBy: { title: "asc" },
-    ...args.input,
-    limit: args.input.limit ?? COLLECTION_DEFAULT_LIMIT,
-  });
+  const total = categories.length;
+  const offset = (Math.max(page, 1) - 1) * limit;
+  const items = categories.slice(offset, offset + limit);
 
-  const items = result.items.map(computeCategoryMetrics);
-
-  return { items, meta: result.meta };
+  return { items, meta: buildPageMeta(total, page, limit) };
 };
 
 export const categoryByTitle = async (...payload) => {
@@ -93,14 +119,18 @@ export const categoryByTitle = async (...payload) => {
 
   const category = await db.Category.findUnique({
     where: { title: args.title },
-    include: include.category.collection,
   });
 
   if (!category) {
     return null;
   }
 
-  return computeCategoryMetrics(category);
+  const stats = await resolveCategoryStatsById(category.id);
+
+  return {
+    ...category,
+    stats: stats ?? ZERO_STATS,
+  };
 };
 
 /*
@@ -117,5 +147,8 @@ export const categoryCreate = async (...payload) => {
     },
   });
 
-  return computeCategoryMetrics(category);
+  return {
+    ...category,
+    stats: ZERO_STATS,
+  };
 };

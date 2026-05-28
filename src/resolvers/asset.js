@@ -6,47 +6,6 @@ import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import * as include from "../include/index.js";
 
-function parseMoney(value) {
-  if (value == null || value === "") {
-    return 0;
-  }
-
-  if (typeof value === "number") {
-    return value;
-  }
-
-  const normalized = String(value).replace(/[$,\s]/g, "");
-  const parsed = Number.parseFloat(normalized);
-
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function parseShare(value) {
-  if (value == null || value === "") {
-    return 0;
-  }
-
-  if (typeof value === "number") {
-    return value;
-  }
-
-  const normalized = String(value).replace(/%/g, "");
-  const parsed = Number.parseFloat(normalized);
-
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function sumParentMetrics(assets) {
-  return assets.reduce(
-    (totals, asset) => {
-      totals.amount += parseMoney(asset.netIncome);
-      totals.share += parseShare(asset.incomeShare);
-      return totals;
-    },
-    { amount: 0, share: 0 },
-  );
-}
-
 export async function findCategory(categoryId) {
   return db.Category.findUnique({
     where: { id: categoryId },
@@ -130,14 +89,8 @@ export const assetCollection = async (...payload) => {
     flattenAssetForList(asset, asset.category?.label ?? category?.label),
   );
 
-  const metrics = sumParentMetrics(assets);
-
   return {
     categoryId: filter.category.id,
-    stats: {
-      amount: metrics.amount,
-      share: metrics.share,
-    },
     items: assets,
     meta: page.meta,
   };

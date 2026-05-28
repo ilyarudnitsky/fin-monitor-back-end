@@ -14,7 +14,7 @@ export const Category = objectType({
     t.implements("Entity");
     t.string("label");
     t.string("title");
-    t.field("metrics", { type: "CategoryMetrics" });
+    t.field("stats", { type: "CategoryStats" });
   },
 });
 

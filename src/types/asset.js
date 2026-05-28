@@ -21,7 +21,6 @@ export const AssetCollection = objectType({
   name: "AssetCollection",
   definition(t) {
     t.implements("EntityCollectionByPage");
-    t.nonNull.field("stats", { type: "CategoryStats" });
     t.nonNull.list.nonNull.field("items", { type: "Asset" });
   },
 });
