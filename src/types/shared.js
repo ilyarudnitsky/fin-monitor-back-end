@@ -58,17 +58,6 @@ export const InvestmentAssetParent = objectType({
   },
 });
 
-export const OperatingAssetParent = objectType({
-  name: "OperatingAsset",
-  definition(t) {
-    t.implements("Entity");
-    t.nonNull.string("name");
-    t.string("notes");
-    t.nonNull.string("netIncome");
-    t.nonNull.string("incomeShare");
-  },
-});
-
 export const DualPurposeAssetType = objectType({
   name: "DualPurposeAsset",
   definition(t) {

@@ -71,7 +71,7 @@ describe("Asset line GraphQL schema (Nexus)", () => {
     const errors = validationErrors(
       schema,
       `mutation {
-        operatingAssetLineCreate(
+        operatingAssetCreate(
           input: {
             category: { id: "22222222-2222-4222-8222-222222222222" }
             asset: { id: "00000000-0000-4000-8000-000000000001" }
