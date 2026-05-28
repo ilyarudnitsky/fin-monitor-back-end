@@ -5,10 +5,9 @@
       "id": true,
       "default": { "uuid": true }
     },
-    "email": { "type": "String", "unique": true },
-    "name": { "type": "String" },
-    "firstName": { "type": "String", "optional": true },
-    "lastName": { "type": "String", "optional": true },
+    "assetId": { "type": "Uuid" },
+    "type": { "type": "String" },
+    "value": { "type": "String" },
     "createdAt": {
       "type": "DateTime",
       "default": { "now": true }
@@ -16,6 +15,11 @@
     "updatedAt": {
       "type": "DateTime",
       "default": { "now": true }
+    },
+    "notes": { "type": "String", "optional": true },
+    "asset": {
+      "type": "Asset",
+      "relation": { "fields": ["assetId"], "references": ["id"] }
     }
   }
 }

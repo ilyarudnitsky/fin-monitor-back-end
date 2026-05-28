@@ -5,7 +5,8 @@ import {
   mutationField,
   nonNull,
 } from "nexus";
-import * as resolvers from "../resolvers/user.js";
+import { defineEntityCollectionByPageInput } from "./entity.js";
+import * as resolvers from "../resolvers/index.js";
 
 /*
  * Objects
@@ -14,7 +15,7 @@ import * as resolvers from "../resolvers/user.js";
 export const User = objectType({
   name: "User",
   definition(t) {
-    t.nonNull.id("id");
+    t.implements("Entity");
     t.nonNull.string("email");
     t.nonNull.string("name");
     t.string("firstName");
@@ -25,6 +26,7 @@ export const User = objectType({
 export const UserCollection = objectType({
   name: "UserCollection",
   definition(t) {
+    t.implements("EntityCollectionByPage");
     t.nonNull.list.nonNull.field("items", { type: "User" });
   },
 });
@@ -36,8 +38,7 @@ export const UserCollection = objectType({
 export const UserCollectionInput = inputObjectType({
   name: "UserCollectionInput",
   definition(t) {
-    t.int("take");
-    t.int("skip");
+    defineEntityCollectionByPageInput(t);
   },
 });
 
@@ -54,7 +55,7 @@ export const UserCreateInput = inputObjectType({
 export const UserUpdateInput = inputObjectType({
   name: "UserUpdateInput",
   definition(t) {
-    t.nonNull.id("id");
+    t.nonNull.uuid("id");
     t.string("email");
     t.string("name");
     t.string("firstName");

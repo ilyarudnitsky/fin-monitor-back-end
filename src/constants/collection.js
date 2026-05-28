@@ -1,0 +1,1 @@
+export const COLLECTION_DEFAULT_LIMIT = 500;

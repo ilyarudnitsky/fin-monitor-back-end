@@ -36,29 +36,27 @@ After deploy, POST to the printed HTTP API URL:
 
 ```graphql
 query {
-  userCollection(input: {}) {
-    items { id email name firstName lastName }
-  }
-  user(input: { id: "00000000-0000-4000-8000-000000000001" }) {
-    name
-    firstName
-    lastName
+  categoryCollection(input: { limit: 500 }) {
+    items {
+      id
+      title
+      label
+      metrics { amount share investedAmount investedValue }
+    }
+    meta { page total pages nextPage }
   }
 }
 
 mutation {
-  userCreate(input: { email: "alice@example.com", name: "Alice" }) {
+  categoryCreate(input: { title: "Stocks", label: "Investing Asset" }) {
     id
-    email
+    title
+    label
   }
-  userUpdate(input: { id: "...", firstName: "Alice", lastName: "Updated" }) {
-    id
-    firstName
-    lastName
-  }
-  userDelete(input: { id: "..." }) { id }
 }
 ```
+
+Auth header: `Authorization: Bearer stub-token` (set `VITE_GRAPHQL_TOKEN=stub-token` in the front-end).
 
 ## Local API (serverless-offline)
 
@@ -72,10 +70,10 @@ GraphQL endpoint: `http://localhost:3000/graphql`
 curl -s -X POST http://localhost:3000/graphql \
   -H 'content-type: application/json' \
   -H 'authorization: Bearer stub-token' \
-  -d '{"query":"{ userCollection(input: {}) { items { id email name firstName lastName } } }"}'
+  -d '{"query":"{ userCollection(input: {}) { items { id email name firstName lastName } meta { page total pages nextPage } } }"}'
 ```
 
-All resolvers require stub auth via the `Authorization` header (`Bearer stub-token`).
+All requests require auth via the `Authorization` header (`Bearer stub-token`), checked in the GraphQL handler context (same idea as reconciliation-backend’s shield, without per-resolver wrappers).
 
 ## Project layout
 
@@ -92,12 +90,23 @@ serverless/
   esbuild.config.js     # esbuild overrides (ESM, externals)
 src/
   handlers/graphql.js   # Apollo Lambda handler
-  models/User.json      # postgresql-orm model
-  types/                # Nexus schema (one file per model)
-    user.js             # User types, inputs, query/mutation fields
+  models/               # postgresql-orm models (Category, Asset, *AssetLine, …)
+  types/                # Nexus schema (one file per domain)
+    category.js
+    investment-asset.js
+    operating-asset.js
+    dual-purpose-asset.js
+    shared.js
+    user.js
     index.js            # makeSchema
-  middleware/           # auth (stub header) + logging
-  resolvers/            # resolve functions (one file per model)
+  middleware/           # authenticateContext (stub header)
+  resolvers/            # plain async resolvers (helpers live in each file)
+    index.js            # barrel export
+    category.js
+    asset.js
+    investment-asset.js
+    operating-asset.js
+    dual-purpose-asset.js
     user.js
   db/                   # postgresql-orm client
 orm.config.json         # postgresql-orm database URL + models path

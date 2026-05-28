@@ -16,7 +16,7 @@ function getHeader(context, name) {
   return key ? headers[key] : undefined;
 }
 
-export async function auth(parent, args, context, info, next) {
+export function authenticateContext(context) {
   const authorization = getHeader(context, "authorization");
 
   if (authorization !== STUB_AUTH_HEADER) {
@@ -24,7 +24,4 @@ export async function auth(parent, args, context, info, next) {
   }
 
   context.auth = STUB_AUTH_USER;
-  return next();
 }
-
-auth.isMiddleware = true;

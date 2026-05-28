@@ -1,77 +1,60 @@
 import { db } from "../db/index.js";
-import { auth } from "../middleware/auth.js";
-import { logging } from "../middleware/logging.js";
-import { composeResolver } from "../middleware/compose.js";
 
-export const user = composeResolver([
-  auth,
-  async (_, args) => {
-    const user = await db.User.findUnique({
-      where: { id: args.input.id },
-    });
+/*
+ * Query
+ */
 
-    return user;
-  },
-  logging,
-]);
+export const user = async (...payload) => {
+  const [, args] = payload;
 
-export const userCollection = composeResolver([
-  auth,
-  async (_, args) => {
-    const users = await db.User.findMany({
-      orderBy: { id: "asc" },
-      ...(args.input.take != null ? { take: args.input.take } : {}),
-      ...(args.input.skip != null ? { skip: args.input.skip } : {}),
-    });
+  return db.User.findUnique({
+    where: { id: args.input.id },
+  });
+};
 
-    return { items: users };
-  },
-  logging,
-]);
+export const userCollection = async (...payload) => {
+  const [, args] = payload;
 
-export const userCreate = composeResolver([
-  auth,
-  async (_, args) => {
-    const user = await db.User.create({
-      data: args.input,
-    });
+  return db.User.paginate({
+    orderBy: { id: "asc" },
+    ...args.input,
+  });
+};
 
-    return user;
-  },
-  logging,
-]);
+/*
+ * Mutations
+ */
 
-export const userUpdate = composeResolver([
-  auth,
-  async (_, args) => {
-    const { id, ...fields } = args.input;
+export const userCreate = async (...payload) => {
+  const [, args] = payload;
 
-    const data = Object.fromEntries(
-      Object.entries(fields).filter(([, value]) => value != null),
-    );
+  return db.User.create({
+    data: args.input,
+  });
+};
 
-    if (Object.keys(data).length === 0) {
-      throw new Error("userUpdate requires at least one field to update");
-    }
+export const userUpdate = async (...payload) => {
+  const [, args] = payload;
+  const { id, ...fields } = args.input;
 
-    const user = await db.User.update({
-      where: { id },
-      data,
-    });
+  const data = Object.fromEntries(
+    Object.entries(fields).filter(([, value]) => value != null),
+  );
 
-    return user;
-  },
-  logging,
-]);
+  if (Object.keys(data).length === 0) {
+    throw new Error("userUpdate requires at least one field to update");
+  }
 
-export const userDelete = composeResolver([
-  auth,
-  async (_, args) => {
-    const user = await db.User.delete({
-      where: { id: args.input.id },
-    });
+  return db.User.update({
+    where: { id },
+    data,
+  });
+};
 
-    return user;
-  },
-  logging,
-]);
+export const userDelete = async (...payload) => {
+  const [, args] = payload;
+
+  return db.User.delete({
+    where: { id: args.input.id },
+  });
+};
