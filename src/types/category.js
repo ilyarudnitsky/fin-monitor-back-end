@@ -41,6 +41,9 @@ export const CategoryCreateInput = inputObjectType({
   },
 });
 
+/*
+ * Queries
+ */
 export const categoryCollection = queryField("categoryCollection", {
   type: "CategoryCollection",
   args: { input: nonNull("CategoryCollectionInput") },
@@ -53,6 +56,9 @@ export const categoryByTitle = queryField("categoryByTitle", {
   resolve: resolvers.categoryByTitle,
 });
 
+/*
+ * Mutations
+ */
 export const categoryCreate = mutationField("categoryCreate", {
   type: "Category",
   args: { input: nonNull("CategoryCreateInput") },

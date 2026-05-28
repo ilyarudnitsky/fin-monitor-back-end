@@ -12,8 +12,10 @@ export const Asset = objectType({
   name: "Asset",
   definition(t) {
     t.implements("Entity");
+    t.uuid("categoryId");
     t.string("name");
     t.string("notes");
+    t.field("stats", { type: "CategoryStats" });
   },
 });
 
@@ -56,6 +58,15 @@ export const assetCollection = queryField("assetCollection", {
   type: "AssetCollection",
   args: { input: nonNull("AssetCollectionInput") },
   resolve: resolvers.assetCollection,
+});
+
+export const assetByName = queryField("assetByName", {
+  type: "Asset",
+  args: {
+    categoryTitle: nonNull("String"),
+    name: nonNull("String"),
+  },
+  resolve: resolvers.assetByName,
 });
 
 /* 

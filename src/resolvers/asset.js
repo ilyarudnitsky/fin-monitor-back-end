@@ -1,10 +1,14 @@
-import {
-  ASSET_GRAPHQL_TYPE,
-  CATEGORY_ASSET_GRAPHQL_TYPE,
-} from "../constants/asset.js";
+import { ASSET_GRAPHQL_TYPE } from "../constants/asset.js";
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import * as include from "../include/index.js";
+import {
+  resolveAssetStats,
+  resolveCategoryAssetsStats,
+  ZERO_STATS,
+} from "../services/finance-stats.js";
+
+export { resolveAssetStats };
 
 export async function findCategory(categoryId) {
   return db.Category.findUnique({
@@ -19,6 +23,21 @@ export async function findAssetRecord(categoryId, assetId) {
   });
 }
 
+export async function findAssetByName(categoryTitle, name) {
+  const category = await db.Category.findUnique({
+    where: { title: categoryTitle },
+  });
+
+  if (!category) {
+    return null;
+  }
+
+  return db.Asset.findFirst({
+    where: { categoryId: category.id, name },
+    include: include.asset.withCategory,
+  });
+}
+
 function assetListFields(asset, detail) {
   return {
     id: asset.id,
@@ -28,26 +47,16 @@ function assetListFields(asset, detail) {
   };
 }
 
-export function flattenAssetForList(asset, categoryLabel) {
+export function flattenAssetForList(asset, _categoryLabel) {
   const detail =
     asset.investmentAsset ?? asset.operatingAsset ?? asset.dualPurposeAsset;
 
-  if (!detail) {
-    return {
-      ...assetListFields(asset),
-      name: asset.name,
-      notes: asset.notes,
-      __graphqlType: ASSET_GRAPHQL_TYPE.BASE,
-    };
-  }
-
+  // Name/notes live on Asset; OperatingAsset/InvestmentAsset/DualPurposeAsset rows are lines.
   return {
     ...assetListFields(asset, detail),
-    name: detail.name,
-    notes: detail.notes,
-    netIncome: detail.netIncome,
-    incomeShare: detail.incomeShare,
-    __graphqlType: CATEGORY_ASSET_GRAPHQL_TYPE[categoryLabel],
+    name: asset.name,
+    notes: asset.notes,
+    __graphqlType: ASSET_GRAPHQL_TYPE.BASE,
   };
 }
 
@@ -58,18 +67,33 @@ export async function findAsset(category, assetId) {
     return null;
   }
 
-  const flattened = flattenAssetForList(asset, category.label);
-
-  if (flattened.__graphqlType === ASSET_GRAPHQL_TYPE.BASE) {
-    return null;
-  }
-
-  return flattened;
+  return flattenAssetForList(asset, category.label);
 }
 
 /*
  * Query
  */
+
+export const assetByName = async (...payload) => {
+  const [, args] = payload;
+  const asset = await findAssetByName(args.categoryTitle, args.name);
+
+  if (!asset) {
+    return null;
+  }
+
+  const stats = await resolveAssetStats(asset.id, asset.categoryId);
+
+  return {
+    id: asset.id,
+    categoryId: asset.categoryId,
+    name: asset.name,
+    notes: asset.notes,
+    createdAt: asset.createdAt,
+    updatedAt: asset.updatedAt,
+    stats: stats ?? ZERO_STATS,
+  };
+};
 
 export const assetCollection = async (...payload) => {
   const [, args] = payload;
@@ -84,10 +108,19 @@ export const assetCollection = async (...payload) => {
   });
 
   const category = page.items.find((asset) => asset.category)?.category;
+  const statsByAssetId = await resolveCategoryAssetsStats(filter.category.id);
 
-  const assets = page.items.map((asset) =>
-    flattenAssetForList(asset, asset.category?.label ?? category?.label),
-  );
+  const assets = page.items.map((asset) => {
+    const flattened = flattenAssetForList(
+      asset,
+      asset.category?.label ?? category?.label,
+    );
+
+    return {
+      ...flattened,
+      stats: statsByAssetId.get(asset.id) ?? ZERO_STATS,
+    };
+  });
 
   return {
     categoryId: filter.category.id,
@@ -104,11 +137,13 @@ export const assetCreate = async (...payload) => {
   const [, args] = payload;
   const { input } = args;
 
-  return db.Asset.create({
+  const result = await db.Asset.create({
     data: {
       categoryId: args.input.category.id,
       name: args.input.name,
       notes: args.input.notes,
     },
   });
+
+  return result;
 };
