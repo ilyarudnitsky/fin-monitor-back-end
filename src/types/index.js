@@ -5,6 +5,7 @@ import * as shared from "./shared.js";
 import * as category from "./category.js";
 import * as asset from "./asset.js";
 import * as operatingAsset from "./operating-asset.js";
+import * as investmentAsset from "./investment-asset.js";
 import * as user from "./user.js";
 
 function isSchemaType(value) {
@@ -33,6 +34,7 @@ export const schema = makeSchema({
     category,
     asset,
     operatingAsset,
+    investmentAsset,
     user,
   ),
   outputs: {

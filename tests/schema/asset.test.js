@@ -27,15 +27,13 @@ describe("Asset GraphQL schema (Nexus)", () => {
             __typename
             ... on Asset {
               id
-              createdAt
-            }
-            ... on InvestmentAsset {
-              id
               name
               notes
-              netIncome
-              incomeShare
               createdAt
+              stats {
+                amount
+                share
+              }
             }
           }
         }

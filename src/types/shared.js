@@ -47,17 +47,6 @@ export const DetailedStatColumn = objectType({
   },
 });
 
-export const InvestmentAssetParent = objectType({
-  name: "InvestmentAsset",
-  definition(t) {
-    t.implements("Entity");
-    t.nonNull.string("name");
-    t.string("notes");
-    t.nonNull.string("netIncome");
-    t.nonNull.string("incomeShare");
-  },
-});
-
 export const DualPurposeAssetType = objectType({
   name: "DualPurposeAsset",
   definition(t) {
@@ -72,7 +61,7 @@ export const DualPurposeAssetType = objectType({
 export const CategoryAsset = unionType({
   name: "CategoryAsset",
   definition(t) {
-    t.members("Asset", "InvestmentAsset", "OperatingAsset", "DualPurposeAsset");
+    t.members("Asset", "DualPurposeAsset");
   },
   resolveType(item) {
     return item.__graphqlType ?? ASSET_GRAPHQL_TYPE.BASE;
