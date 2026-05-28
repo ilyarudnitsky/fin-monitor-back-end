@@ -134,8 +134,6 @@ export const assetCollection = async (...payload) => {
 
   return {
     categoryId: filter.category.id,
-    categoryTitle: category?.title ?? "",
-    categoryLabel: category?.label ?? "",
     stats: {
       amount: metrics.amount,
       share: metrics.share,

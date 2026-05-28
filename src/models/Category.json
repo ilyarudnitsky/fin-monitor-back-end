@@ -6,7 +6,7 @@
       "default": { "uuid": true }
     },
     "label": { "type": "String" },
-    "title": { "type": "String" },
+    "title": { "type": "String", "unique": true },
     "createdAt": {
       "type": "DateTime",
       "default": { "now": true }

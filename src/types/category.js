@@ -12,9 +12,9 @@ export const Category = objectType({
   name: "Category",
   definition(t) {
     t.implements("Entity");
-    t.nonNull.string("label");
-    t.nonNull.string("title");
-    t.nonNull.field("metrics", { type: "CategoryMetrics" });
+    t.string("label");
+    t.string("title");
+    t.field("metrics", { type: "CategoryMetrics" });
   },
 });
 
@@ -22,7 +22,7 @@ export const CategoryCollection = objectType({
   name: "CategoryCollection",
   definition(t) {
     t.implements("EntityCollectionByPage");
-    t.nonNull.list.nonNull.field("items", { type: "Category" });
+    t.list.field("items", { type: "Category" });
   },
 });
 
@@ -45,6 +45,12 @@ export const categoryCollection = queryField("categoryCollection", {
   type: "CategoryCollection",
   args: { input: nonNull("CategoryCollectionInput") },
   resolve: resolvers.categoryCollection,
+});
+
+export const categoryByTitle = queryField("categoryByTitle", {
+  type: "Category",
+  args: { title: nonNull("String") },
+  resolve: resolvers.categoryByTitle,
 });
 
 export const categoryCreate = mutationField("categoryCreate", {

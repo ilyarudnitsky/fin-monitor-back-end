@@ -21,11 +21,8 @@ export const AssetCollection = objectType({
   name: "AssetCollection",
   definition(t) {
     t.implements("EntityCollectionByPage");
-    t.nonNull.uuid("categoryId");
-    t.nonNull.string("categoryTitle");
-    t.nonNull.string("categoryLabel");
     t.nonNull.field("stats", { type: "CategoryStats" });
-    t.nonNull.list.nonNull.field("items", { type: "CategoryAsset" });
+    t.nonNull.list.nonNull.field("items", { type: "Asset" });
   },
 });
 
@@ -44,12 +41,6 @@ export const AssetCollectionInput = inputObjectType({
   },
 });
 
-export const assetCollection = queryField("assetCollection", {
-  type: "AssetCollection",
-  args: { input: nonNull("AssetCollectionInput") },
-  resolve: resolvers.assetCollection,
-});
-
 export const AssetCreateInput = inputObjectType({
   name: "AssetCreateInput",
   definition(t) {
@@ -59,6 +50,18 @@ export const AssetCreateInput = inputObjectType({
   },
 });
 
+/*
+ * Queries
+ */
+export const assetCollection = queryField("assetCollection", {
+  type: "AssetCollection",
+  args: { input: nonNull("AssetCollectionInput") },
+  resolve: resolvers.assetCollection,
+});
+
+/* 
+ * Mutations
+ */
 export const assetCreate = mutationField("assetCreate", {
   type: "Asset",
   args: { input: nonNull("AssetCreateInput") },

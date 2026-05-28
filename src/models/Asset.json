@@ -6,7 +6,7 @@
       "default": { "uuid": true }
     },
     "categoryId": { "type": "Uuid" },
-    "name": { "type": "String" },
+    "name": { "type": "String", "unique": true },
     "notes": { "type": "String", "optional": true },
     "createdAt": {
       "type": "DateTime",

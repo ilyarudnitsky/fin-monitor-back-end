@@ -88,6 +88,21 @@ export const categoryCollection = async (...payload) => {
   return { items, meta: result.meta };
 };
 
+export const categoryByTitle = async (...payload) => {
+  const [, args] = payload;
+
+  const category = await db.Category.findUnique({
+    where: { title: args.title },
+    include: include.category.collection,
+  });
+
+  if (!category) {
+    return null;
+  }
+
+  return computeCategoryMetrics(category);
+};
+
 /*
  * Mutations
  */
