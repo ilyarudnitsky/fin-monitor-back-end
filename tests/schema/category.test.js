@@ -83,13 +83,32 @@ describe("Category GraphQL schema (Nexus)", () => {
             title
             type
           }
+          categoryUpdate(
+            input: { id: "11111111-1111-4111-8111-111111111111", title: "Updated" }
+          ) {
+            id
+            title
+          }
+          categoryDelete(input: { id: "11111111-1111-4111-8111-111111111111" }) {
+            id
+          }
           assetCreate(
             input: {
               category: { id: "11111111-1111-4111-8111-111111111111" }
+              name: "Asset"
             }
           ) {
             id
             createdAt
+          }
+          assetUpdate(
+            input: { id: "00000000-0000-4000-8000-000000000001", name: "Renamed" }
+          ) {
+            id
+            name
+          }
+          assetDelete(input: { id: "00000000-0000-4000-8000-000000000001" }) {
+            id
           }
           investmentAssetCreate(
             input: {

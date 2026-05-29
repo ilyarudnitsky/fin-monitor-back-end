@@ -51,6 +51,15 @@ export const AssetCreateInput = inputObjectType({
   },
 });
 
+export const AssetUpdateInput = inputObjectType({
+  name: "AssetUpdateInput",
+  definition(t) {
+    t.nonNull.uuid("id");
+    t.string("name");
+    t.string("notes");
+  },
+});
+
 /*
  * Queries
  */
@@ -76,4 +85,16 @@ export const assetCreate = mutationField("assetCreate", {
   type: "Asset",
   args: { input: nonNull("AssetCreateInput") },
   resolve: resolvers.assetCreate,
+});
+
+export const assetUpdate = mutationField("assetUpdate", {
+  type: "Asset",
+  args: { input: nonNull("AssetUpdateInput") },
+  resolve: resolvers.assetUpdate,
+});
+
+export const assetDelete = mutationField("assetDelete", {
+  type: "Asset",
+  args: { input: nonNull("EntityInput") },
+  resolve: resolvers.assetDelete,
 });

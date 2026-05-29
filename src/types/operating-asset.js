@@ -40,6 +40,17 @@ export const OperatingAssetCreateInput = inputObjectType({
   },
 });
 
+export const OperatingAssetUpdateInput = inputObjectType({
+  name: "OperatingAssetUpdateInput",
+  definition(t) {
+    t.nonNull.uuid("id");
+    t.string("type");
+    t.string("value");
+    t.dateTime("createdAt");
+    t.string("notes");
+  },
+});
+
 export const OperatingAssetCollectionInput = inputObjectType({
   name: "OperatingAssetCollectionInput",
   definition(t) {
@@ -78,4 +89,16 @@ export const operatingAssetCreate = mutationField("operatingAssetCreate", {
   type: "OperatingAsset",
   args: { input: nonNull("OperatingAssetCreateInput") },
   resolve: resolvers.operatingAssetCreate,
+});
+
+export const operatingAssetUpdate = mutationField("operatingAssetUpdate", {
+  type: "OperatingAsset",
+  args: { input: nonNull("OperatingAssetUpdateInput") },
+  resolve: resolvers.operatingAssetUpdate,
+});
+
+export const operatingAssetDelete = mutationField("operatingAssetDelete", {
+  type: "OperatingAsset",
+  args: { input: nonNull("EntityInput") },
+  resolve: resolvers.operatingAssetDelete,
 });

@@ -1,4 +1,6 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
+import { deleteCategoryWithAssets } from "../lib/delete-cascades.js";
+import { buildUpdateData } from "../lib/patch-input.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
 import { db } from "../db/index.js";
 import {
@@ -87,4 +89,32 @@ export const categoryCreate = async (...payload) => {
     ...category,
     stats: ZERO_STATS,
   };
+};
+
+export const categoryUpdate = async (...payload) => {
+  const [, args] = payload;
+  const { id, ...fields } = args.input;
+
+  const data = buildUpdateData(
+    fields,
+    "categoryUpdate requires at least one field to update",
+  );
+
+  const category = await db.Category.update({
+    where: { id },
+    data,
+  });
+
+  const stats = await resolveCategoryStatsById(category.id);
+
+  return {
+    ...category,
+    stats: stats ?? ZERO_STATS,
+  };
+};
+
+export const categoryDelete = async (...payload) => {
+  const [, args] = payload;
+
+  return deleteCategoryWithAssets(args.input.id);
 };

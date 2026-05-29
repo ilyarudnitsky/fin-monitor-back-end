@@ -1,6 +1,7 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
+import { buildUpdateData } from "../lib/patch-input.js";
 import { normalizeMoneyValue } from "../lib/money.js";
 
 /*
@@ -50,4 +51,30 @@ export const operatingAssetCreate = async (...payload) => {
   });
 
   return result;
+};
+
+export const operatingAssetUpdate = async (...payload) => {
+  const [, args] = payload;
+  const { id, value, ...fields } = args.input;
+
+  const data = buildUpdateData(
+    {
+      ...fields,
+      ...(value != null ? { value: normalizeMoneyValue(value) } : {}),
+    },
+    "operatingAssetUpdate requires at least one field to update",
+  );
+
+  return db.OperatingAsset.update({
+    where: { id },
+    data,
+  });
+};
+
+export const operatingAssetDelete = async (...payload) => {
+  const [, args] = payload;
+
+  return db.OperatingAsset.delete({
+    where: { id: args.input.id },
+  });
 };

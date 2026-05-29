@@ -1,6 +1,7 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
+import { buildUpdateData } from "../lib/patch-input.js";
 import {
   normalizeAmountWithUnitValue,
   normalizeMoneyValue,
@@ -50,4 +51,33 @@ export const dualPurposeAssetCreate = async (...payload) => {
   });
 
   return result;
+};
+
+export const dualPurposeAssetUpdate = async (...payload) => {
+  const [, args] = payload;
+  const { id, amount, quantity, price, commission, ...fields } = args.input;
+
+  const data = buildUpdateData(
+    {
+      ...fields,
+      ...(amount != null ? { amount: normalizeAmountWithUnitValue(amount) } : {}),
+      ...(quantity != null ? { quantity: normalizeQuantityValue(quantity) } : {}),
+      ...(price != null ? { price: normalizeMoneyValue(price) } : {}),
+      ...(commission != null ? { commission: normalizeMoneyValue(commission) } : {}),
+    },
+    "dualPurposeAssetUpdate requires at least one field to update",
+  );
+
+  return db.DualPurposeAsset.update({
+    where: { id },
+    data,
+  });
+};
+
+export const dualPurposeAssetDelete = async (...payload) => {
+  const [, args] = payload;
+
+  return db.DualPurposeAsset.delete({
+    where: { id: args.input.id },
+  });
 };

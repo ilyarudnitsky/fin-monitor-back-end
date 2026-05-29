@@ -1,6 +1,8 @@
 import { ASSET_GRAPHQL_TYPE } from "../constants/asset.js";
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
+import { deleteAssetLines } from "../lib/delete-cascades.js";
+import { buildUpdateData } from "../lib/patch-input.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
 import * as include from "../include/index.js";
 import {
@@ -148,4 +150,30 @@ export const assetCreate = async (...payload) => {
   });
 
   return result;
+};
+
+export const assetUpdate = async (...payload) => {
+  const [, args] = payload;
+  const { id, ...fields } = args.input;
+
+  const data = buildUpdateData(
+    fields,
+    "assetUpdate requires at least one field to update",
+  );
+
+  return db.Asset.update({
+    where: { id },
+    data,
+  });
+};
+
+export const assetDelete = async (...payload) => {
+  const [, args] = payload;
+  const { id } = args.input;
+
+  await deleteAssetLines(id);
+
+  return db.Asset.delete({
+    where: { id },
+  });
 };

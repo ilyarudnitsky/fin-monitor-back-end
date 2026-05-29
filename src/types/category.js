@@ -49,6 +49,15 @@ export const CategoryCreateInput = inputObjectType({
   },
 });
 
+export const CategoryUpdateInput = inputObjectType({
+  name: "CategoryUpdateInput",
+  definition(t) {
+    t.nonNull.uuid("id");
+    t.string("title");
+    t.string("type");
+  },
+});
+
 /*
  * Queries
  */
@@ -71,4 +80,16 @@ export const categoryCreate = mutationField("categoryCreate", {
   type: "Category",
   args: { input: nonNull("CategoryCreateInput") },
   resolve: resolvers.categoryCreate,
+});
+
+export const categoryUpdate = mutationField("categoryUpdate", {
+  type: "Category",
+  args: { input: nonNull("CategoryUpdateInput") },
+  resolve: resolvers.categoryUpdate,
+});
+
+export const categoryDelete = mutationField("categoryDelete", {
+  type: "Category",
+  args: { input: nonNull("EntityInput") },
+  resolve: resolvers.categoryDelete,
 });

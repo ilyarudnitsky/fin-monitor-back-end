@@ -46,6 +46,20 @@ export const DualPurposeAssetCreateInput = inputObjectType({
   },
 });
 
+export const DualPurposeAssetUpdateInput = inputObjectType({
+  name: "DualPurposeAssetUpdateInput",
+  definition(t) {
+    t.nonNull.uuid("id");
+    t.string("type");
+    t.string("amount");
+    t.string("quantity");
+    t.string("price");
+    t.string("commission");
+    t.dateTime("createdAt");
+    t.string("notes");
+  },
+});
+
 export const DualPurposeAssetCollectionInput = inputObjectType({
   name: "DualPurposeAssetCollectionInput",
   definition(t) {
@@ -77,4 +91,16 @@ export const dualPurposeAssetCreate = mutationField("dualPurposeAssetCreate", {
   type: "DualPurposeAsset",
   args: { input: nonNull("DualPurposeAssetCreateInput") },
   resolve: resolvers.dualPurposeAssetCreate,
+});
+
+export const dualPurposeAssetUpdate = mutationField("dualPurposeAssetUpdate", {
+  type: "DualPurposeAsset",
+  args: { input: nonNull("DualPurposeAssetUpdateInput") },
+  resolve: resolvers.dualPurposeAssetUpdate,
+});
+
+export const dualPurposeAssetDelete = mutationField("dualPurposeAssetDelete", {
+  type: "DualPurposeAsset",
+  args: { input: nonNull("EntityInput") },
+  resolve: resolvers.dualPurposeAssetDelete,
 });

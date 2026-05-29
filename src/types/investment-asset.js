@@ -46,6 +46,20 @@ export const InvestmentAssetCreateInput = inputObjectType({
   },
 });
 
+export const InvestmentAssetUpdateInput = inputObjectType({
+  name: "InvestmentAssetUpdateInput",
+  definition(t) {
+    t.nonNull.uuid("id");
+    t.string("type");
+    t.string("amount");
+    t.string("quantity");
+    t.string("price");
+    t.string("commission");
+    t.dateTime("createdAt");
+    t.string("notes");
+  },
+});
+
 export const InvestmentAssetCollectionInput = inputObjectType({
   name: "InvestmentAssetCollectionInput",
   definition(t) {
@@ -77,4 +91,16 @@ export const investmentAssetCreate = mutationField("investmentAssetCreate", {
   type: "InvestmentAsset",
   args: { input: nonNull("InvestmentAssetCreateInput") },
   resolve: resolvers.investmentAssetCreate,
+});
+
+export const investmentAssetUpdate = mutationField("investmentAssetUpdate", {
+  type: "InvestmentAsset",
+  args: { input: nonNull("InvestmentAssetUpdateInput") },
+  resolve: resolvers.investmentAssetUpdate,
+});
+
+export const investmentAssetDelete = mutationField("investmentAssetDelete", {
+  type: "InvestmentAsset",
+  args: { input: nonNull("EntityInput") },
+  resolve: resolvers.investmentAssetDelete,
 });

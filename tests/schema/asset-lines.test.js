@@ -91,6 +91,43 @@ describe("Asset line GraphQL schema (Nexus)", () => {
     expect(errors).toEqual([]);
   });
 
+  it("accepts line update and delete mutations", () => {
+    const errors = validationErrors(
+      schema,
+      `mutation {
+        operatingAssetUpdate(
+          input: { id: "00000000-0000-4000-8000-000000000001", type: "income" }
+        ) {
+          id
+        }
+        operatingAssetDelete(input: { id: "00000000-0000-4000-8000-000000000001" }) {
+          id
+        }
+        investmentAssetUpdate(
+          input: {
+            id: "00000000-0000-4000-8000-000000000002"
+            amount: "100 g"
+          }
+        ) {
+          id
+        }
+        investmentAssetDelete(input: { id: "00000000-0000-4000-8000-000000000002" }) {
+          id
+        }
+        dualPurposeAssetUpdate(
+          input: { id: "00000000-0000-4000-8000-000000000003", price: "$500" }
+        ) {
+          id
+        }
+        dualPurposeAssetDelete(input: { id: "00000000-0000-4000-8000-000000000003" }) {
+          id
+        }
+      }`,
+    );
+
+    expect(errors).toEqual([]);
+  });
+
   it("accepts line create mutations", () => {
     const errors = validationErrors(
       schema,
