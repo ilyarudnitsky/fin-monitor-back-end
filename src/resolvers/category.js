@@ -1,4 +1,5 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
+import { mapSortToOrderBy } from "../lib/collection-sort.js";
 import { db } from "../db/index.js";
 import {
   resolveAllCategoryStatsMap,
@@ -28,7 +29,10 @@ export const categoryCollection = async (...payload) => {
   const typeFilter = args.input.filter?.type;
 
   const categories = await db.Category.findMany({
-    orderBy: { title: "asc" },
+    orderBy: mapSortToOrderBy(args.input?.sort, {
+      defaultBy: "title",
+      defaultOrder: "asc",
+    }),
     ...(typeFilter ? { where: { type: typeFilter } } : {}),
   });
 

@@ -1,5 +1,6 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
+import { mapSortToOrderBy } from "../lib/collection-sort.js";
 
 /*
  * Query
@@ -21,7 +22,7 @@ export const operatingAssetCollection = async (...payload) => {
 
   const result = await db.OperatingAsset.paginate({
     where: { assetId: asset.id },
-    orderBy: { createdAt: "desc" },
+    orderBy: mapSortToOrderBy(args.input?.sort),
     limit: args.input.limit ?? COLLECTION_DEFAULT_LIMIT,
     page: args.input.page ?? 1,
   });

@@ -1,6 +1,7 @@
 import { ASSET_GRAPHQL_TYPE } from "../constants/asset.js";
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
+import { mapSortToOrderBy } from "../lib/collection-sort.js";
 import * as include from "../include/index.js";
 import {
   resolveAssetStats,
@@ -98,19 +99,20 @@ export const assetByName = async (...payload) => {
 export const assetCollection = async (...payload) => {
   const [, args] = payload;
   const { filter, ...pagination } = args.input;
+  const categoryId = filter.category.id;
 
   const page = await db.Asset.paginate({
-    where: { categoryId: filter.category.id },
+    where: { categoryId },
     include: include.asset.withCategory,
-    orderBy: { createdAt: "desc" },
+    orderBy: mapSortToOrderBy(args.input?.sort),
     ...pagination,
     limit: pagination.limit ?? COLLECTION_DEFAULT_LIMIT,
   });
 
   const category = page.items.find((asset) => asset.category)?.category;
-  const statsByAssetId = await resolveCategoryAssetsStats(filter.category.id);
+  const statsByAssetId = await resolveCategoryAssetsStats(categoryId);
 
-  const assets = page.items.map((asset) => {
+  const items = page.items.map((asset) => {
     const flattened = flattenAssetForList(
       asset,
       asset.category?.type ?? category?.type,
@@ -123,8 +125,8 @@ export const assetCollection = async (...payload) => {
   });
 
   return {
-    categoryId: filter.category.id,
-    items: assets,
+    categoryId,
+    items,
     meta: page.meta,
   };
 };

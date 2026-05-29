@@ -1,5 +1,6 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
+import { mapSortToOrderBy } from "../lib/collection-sort.js";
 
 export const dualPurposeAsset = async (...payload) => {
   const [, args] = payload;
@@ -18,7 +19,7 @@ export const dualPurposeAssetCollection = async (...payload) => {
 
   const result = await db.DualPurposeAsset.paginate({
     where: { assetId: asset.id },
-    orderBy: { createdAt: "desc" },
+    orderBy: mapSortToOrderBy(args.input?.sort),
     limit: args.input.limit ?? COLLECTION_DEFAULT_LIMIT,
     page: args.input.page ?? 1,
   });
