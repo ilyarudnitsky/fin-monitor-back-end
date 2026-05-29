@@ -19,7 +19,7 @@ export const dualPurposeAssetCollection = async (...payload) => {
   const result = await db.DualPurposeAsset.paginate({
     where: { assetId: asset.id },
     orderBy: { createdAt: "desc" },
-    limit: COLLECTION_DEFAULT_LIMIT,
+    limit: args.input.limit ?? COLLECTION_DEFAULT_LIMIT,
     page: args.input.page ?? 1,
   });
 
