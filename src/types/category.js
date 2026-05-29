@@ -12,7 +12,7 @@ export const Category = objectType({
   name: "Category",
   definition(t) {
     t.implements("Entity");
-    t.string("label");
+    t.string("type");
     t.string("title");
     t.field("stats", { type: "CategoryStats" });
   },
@@ -29,7 +29,7 @@ export const CategoryCollection = objectType({
 export const CategoryCollectionInputFilter = inputObjectType({
   name: "CategoryCollectionInputFilter",
   definition(t) {
-    t.nonNull.string("label");
+    t.nonNull.string("type");
   },
 });
 
@@ -45,7 +45,7 @@ export const CategoryCreateInput = inputObjectType({
   name: "CategoryCreateInput",
   definition(t) {
     t.nonNull.string("title");
-    t.nonNull.string("label");
+    t.nonNull.string("type");
   },
 });
 

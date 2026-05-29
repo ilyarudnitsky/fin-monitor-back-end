@@ -40,7 +40,7 @@ query {
     items {
       id
       title
-      label
+      type
       metrics { amount share investedAmount investedValue }
     }
     meta { page total pages nextPage }
@@ -48,10 +48,10 @@ query {
 }
 
 mutation {
-  categoryCreate(input: { title: "Stocks", label: "Investing Asset" }) {
+  categoryCreate(input: { title: "Stocks", type: "Investing Asset" }) {
     id
     title
-    label
+    type
   }
 }
 ```

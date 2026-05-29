@@ -67,7 +67,7 @@ export async function findAsset(category, assetId) {
     return null;
   }
 
-  return flattenAssetForList(asset, category.label);
+  return flattenAssetForList(asset, category.type);
 }
 
 /*
@@ -113,7 +113,7 @@ export const assetCollection = async (...payload) => {
   const assets = page.items.map((asset) => {
     const flattened = flattenAssetForList(
       asset,
-      asset.category?.label ?? category?.label,
+      asset.category?.type ?? category?.type,
     );
 
     return {

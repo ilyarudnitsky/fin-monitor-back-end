@@ -25,11 +25,11 @@ export const categoryCollection = async (...payload) => {
   const [, args] = payload;
   const page = args.input.page ?? 1;
   const limit = args.input.limit ?? COLLECTION_DEFAULT_LIMIT;
-  const labelFilter = args.input.filter?.label;
+  const typeFilter = args.input.filter?.type;
 
   const categories = await db.Category.findMany({
     orderBy: { title: "asc" },
-    ...(labelFilter ? { where: { label: labelFilter } } : {}),
+    ...(typeFilter ? { where: { type: typeFilter } } : {}),
   });
 
   const statsByCategoryId = await resolveAllCategoryStatsMap();
@@ -75,7 +75,7 @@ export const categoryCreate = async (...payload) => {
   const category = await db.Category.create({
     data: {
       title: args.input.title,
-      label: args.input.label,
+      type: args.input.type,
     },
   });
 

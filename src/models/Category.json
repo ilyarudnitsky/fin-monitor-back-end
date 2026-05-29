@@ -5,7 +5,7 @@
       "id": true,
       "default": { "uuid": true }
     },
-    "label": { "type": "String" },
+    "type": { "type": "String" },
     "title": { "type": "String", "unique": true },
     "createdAt": {
       "type": "DateTime",

@@ -24,7 +24,7 @@ describe("Category GraphQL schema (Nexus)", () => {
           categoryCollection(input: { limit: 500 }) {
             items {
               id
-              label
+              type
               title
               metrics { amount share investedAmount investedValue }
             }
@@ -36,14 +36,14 @@ describe("Category GraphQL schema (Nexus)", () => {
       expect(errors).toEqual([]);
     });
 
-    it("accepts categoryCollection filtered by label", () => {
+    it("accepts categoryCollection filtered by type", () => {
       const errors = validationErrors(
         schema,
         `query {
           categoryCollection(
-            input: { limit: 500, filter: { label: "Operating Asset" } }
+            input: { limit: 500, filter: { type: "Operating Asset" } }
           ) {
-            items { id label title }
+            items { id type title }
             meta { total }
           }
         }`,
@@ -78,10 +78,10 @@ describe("Category GraphQL schema (Nexus)", () => {
       const errors = validationErrors(
         schema,
         `mutation {
-          categoryCreate(input: { title: "Stocks", label: "Investing Asset" }) {
+          categoryCreate(input: { title: "Stocks", type: "Investing Asset" }) {
             id
             title
-            label
+            type
           }
           assetCreate(
             input: {
@@ -117,7 +117,7 @@ describe("Category GraphQL schema (Nexus)", () => {
         items: [
           {
             id: "11111111-1111-4111-8111-111111111111",
-            label: "Investing Asset",
+            type: "Investing Asset",
             title: "Stocks",
             assets: [],
           },
@@ -132,7 +132,7 @@ describe("Category GraphQL schema (Nexus)", () => {
             items {
               id
               title
-              label
+              type
               metrics { amount share investedAmount investedValue }
             }
             meta { page total pages }
@@ -145,7 +145,7 @@ describe("Category GraphQL schema (Nexus)", () => {
         {
           id: "11111111-1111-4111-8111-111111111111",
           title: "Stocks",
-          label: "Investing Asset",
+          type: "Investing Asset",
           metrics: { amount: 0, share: 0, investedAmount: 0, investedValue: 0 },
         },
       ]);
@@ -154,7 +154,7 @@ describe("Category GraphQL schema (Nexus)", () => {
     it("returns zero metrics from categoryCreate without loaded assets", async () => {
       db.Category.create.mockResolvedValue({
         id: "22222222-2222-4222-8222-222222222222",
-        label: "Operating Asset",
+        type: "Operating Asset",
         title: "Rental",
         createdAt: new Date("2026-01-01T00:00:00.000Z"),
         updatedAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -163,10 +163,10 @@ describe("Category GraphQL schema (Nexus)", () => {
       const result = await executeOperation(
         schema,
         `mutation {
-          categoryCreate(input: { title: "Rental", label: "Operating Asset" }) {
+          categoryCreate(input: { title: "Rental", type: "Operating Asset" }) {
             id
             title
-            label
+            type
             metrics { amount share }
           }
         }`,
