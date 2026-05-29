@@ -26,10 +26,18 @@ export const CategoryCollection = objectType({
   },
 });
 
+export const CategoryCollectionInputFilter = inputObjectType({
+  name: "CategoryCollectionInputFilter",
+  definition(t) {
+    t.nonNull.string("label");
+  },
+});
+
 export const CategoryCollectionInput = inputObjectType({
   name: "CategoryCollectionInput",
   definition(t) {
     defineEntityCollectionByPageInput(t);
+    t.field("filter", { type: "CategoryCollectionInputFilter" });
   },
 });
 

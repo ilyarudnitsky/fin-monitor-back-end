@@ -25,9 +25,11 @@ export const categoryCollection = async (...payload) => {
   const [, args] = payload;
   const page = args.input.page ?? 1;
   const limit = args.input.limit ?? COLLECTION_DEFAULT_LIMIT;
+  const labelFilter = args.input.filter?.label;
 
   const categories = await db.Category.findMany({
     orderBy: { title: "asc" },
+    ...(labelFilter ? { where: { label: labelFilter } } : {}),
   });
 
   const statsByCategoryId = await resolveAllCategoryStatsMap();

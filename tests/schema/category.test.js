@@ -36,6 +36,22 @@ describe("Category GraphQL schema (Nexus)", () => {
       expect(errors).toEqual([]);
     });
 
+    it("accepts categoryCollection filtered by label", () => {
+      const errors = validationErrors(
+        schema,
+        `query {
+          categoryCollection(
+            input: { limit: 500, filter: { label: "Operating Asset" } }
+          ) {
+            items { id label title }
+            meta { total }
+          }
+        }`,
+      );
+
+      expect(errors).toEqual([]);
+    });
+
     it("accepts investmentAssetStatistics with nested detailedStats", () => {
       const errors = validationErrors(
         schema,
