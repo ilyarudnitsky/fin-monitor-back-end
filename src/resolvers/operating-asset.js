@@ -1,6 +1,7 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
+import { normalizeMoneyValue } from "../lib/money.js";
 
 /*
  * Query
@@ -42,7 +43,7 @@ export const operatingAssetCreate = async (...payload) => {
     data: {
       assetId: input.asset.id,
       type: input.type,
-      value: input.value,
+      value: normalizeMoneyValue(input.value),
       createdAt: input.createdAt,
       notes: input.notes,
     },

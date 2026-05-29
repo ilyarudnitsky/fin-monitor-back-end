@@ -1,6 +1,11 @@
 import { COLLECTION_DEFAULT_LIMIT } from "../constants/collection.js";
 import { db } from "../db/index.js";
 import { mapSortToOrderBy } from "../lib/collection-sort.js";
+import {
+  normalizeAmountWithUnitValue,
+  normalizeMoneyValue,
+  normalizeQuantityValue,
+} from "../lib/money.js";
 
 export const dualPurposeAsset = async (...payload) => {
   const [, args] = payload;
@@ -35,10 +40,10 @@ export const dualPurposeAssetCreate = async (...payload) => {
     data: {
       assetId: input.asset.id,
       type: input.type,
-      amount: input.amount,
-      quantity: input.quantity,
-      price: input.price,
-      commission: input.commission,
+      amount: normalizeAmountWithUnitValue(input.amount),
+      quantity: normalizeQuantityValue(input.quantity),
+      price: normalizeMoneyValue(input.price),
+      commission: normalizeMoneyValue(input.commission),
       createdAt: input.createdAt,
       notes: input.notes,
     },
